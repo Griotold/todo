@@ -77,5 +77,20 @@ public class TodoService {
 
     }
 
+    /**
+     * 삭제
+     */
+    public List<TodoEntity> delete(final TodoEntity entity) {
+        validate(entity);
 
+        try {
+            todoRepository.delete(entity);
+        } catch (Exception e) {
+            log.error("error deleting entity", entity.getId(), e);
+
+            throw  new RuntimeException("error deleting entity " + entity.getId());
+        }
+
+        return findAll(entity.getUserId());
+    }
 }
