@@ -6,7 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.xml.stream.events.EntityReference;
 import java.util.List;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,9 @@ public class TodoService {
         return savedEntity.getTitle();
     }
 
+    /**
+     * 생성
+     * */
     public List<TodoEntity> create(final TodoEntity entity) {
         // Validations
         validate(entity);
@@ -45,7 +51,31 @@ public class TodoService {
         }
     }
 
+    /**
+     * 조회
+     * */
     public List<TodoEntity> findAll(final String userId) {
         return todoRepository.findByUserId(userId);
     }
+
+    /**
+     * 수정
+     */
+    public List<TodoEntity> update(final TodoEntity entity) {
+        validate(entity);
+
+        final Optional<TodoEntity> original = todoRepository.findById(entity.getId());
+
+        original.ifPresent(todo -> {
+            todo.setTitle(entity.getTitle());
+            todo.setDone(entity.isDone());
+
+            todoRepository.save(todo);
+        });
+
+        return findAll(entity.getUserId());
+
+    }
+
+
 }
